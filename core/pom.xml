@@ -23,6 +23,7 @@
     <version>10.2.0</version>
   </parent>
 
+  <version>10.2.2</version>
   <artifactId>feign-core</artifactId>
   <name>Feign Core</name>
   <description>Feign Core</description>
