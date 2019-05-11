@@ -73,26 +73,17 @@ final class SynchronousMethodHandler implements MethodHandler {
   public Object invoke(Object[] argv) throws Throwable {
     RequestTemplate template = buildTemplateFromArgs.create(argv);
     Retryer retryer = this.retryer.clone();
-    while (true) {
-      try {
-        return executeAndDecode(template);
-      } catch (RetryableException e) {
-        try {
-          retryer.continueOrPropagate(e);
-        } catch (RetryableException th) {
-          Throwable cause = th.getCause();
-          if (propagationPolicy == UNWRAP && cause != null) {
-            throw cause;
-          } else {
-            throw th;
-          }
-        }
-        if (logLevel != Logger.Level.NONE) {
-          logger.logRetry(metadata.configKey(), logLevel);
-        }
-        continue;
+
+    try {
+      return executeAndDecode(template);
+    } catch (RetryableException e) {
+      retryer.continueOrPropagate(e);
+      if (logLevel != Logger.Level.NONE) {
+        logger.logRetry(metadata.configKey(), logLevel);
       }
     }
+    
+    return decoder.decode(null, metadata.returnType());
   }
 
   Object executeAndDecode(RequestTemplate template) throws Throwable {
