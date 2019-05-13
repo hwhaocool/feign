@@ -82,7 +82,7 @@ final class SynchronousMethodHandler implements MethodHandler {
         logger.logRetry(metadata.configKey(), logLevel);
       }
     }
-    
+
     return decoder.decode(null, metadata.returnType());
   }
 
