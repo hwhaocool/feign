@@ -74,12 +74,16 @@ final class SynchronousMethodHandler implements MethodHandler {
     RequestTemplate template = buildTemplateFromArgs.create(argv);
     Retryer retryer = this.retryer.clone();
 
-    try {
-      return executeAndDecode(template);
-    } catch (RetryableException e) {
-      retryer.continueOrPropagate(e);
-      if (logLevel != Logger.Level.NONE) {
-        logger.logRetry(metadata.configKey(), logLevel);
+    while (true) {
+      try {
+        return executeAndDecode(template);
+      } catch (RetryableException e) {
+        retryer.continueOrPropagate(e);
+        if (logLevel != Logger.Level.NONE) {
+          logger.logRetry(metadata.configKey(), logLevel);
+        }
+      } catch (Exception e) {
+        break;
       }
     }
 
