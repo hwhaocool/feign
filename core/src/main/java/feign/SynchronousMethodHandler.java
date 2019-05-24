@@ -78,12 +78,16 @@ final class SynchronousMethodHandler implements MethodHandler {
       try {
         return executeAndDecode(template);
       } catch (RetryableException e) {
-        retryer.continueOrPropagate(e);
+        
+        try {
+          retryer.continueOrPropagate(e);
+        } catch (Exception e1) {
+          break;
+        }
+        
         if (logLevel != Logger.Level.NONE) {
           logger.logRetry(metadata.configKey(), logLevel);
         }
-      } catch (Exception e) {
-        break;
       }
     }
 
